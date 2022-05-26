@@ -1,0 +1,8 @@
+libcustomsignal.dylib
+.dylib
+.o
+a.out
+*.rep
+*.lock
+aesni.gpr
+.vscode
