@@ -116,7 +116,7 @@ int aes128_self_test(void){
 }
 
 int main(int argc, char **argv) {
-    //printf("regular main at %p\n", main);
+    printf("regular main \n");
     printf("%d\n", aes128_self_test());
     return 0;
 }

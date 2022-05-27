@@ -1,13 +1,19 @@
 all: libcustomsignal.dylib a.out
 
 gadget.o : gadget.c
-	gcc -c gadget.c
+	gcc -g -c gadget.c
 
 signal.o : signal.c
-	gcc -c signal.c
+	gcc -g -c signal.c
 
-libcustomsignal.dylib: signal.o gadget.o
-	gcc -dynamiclib signal.o gadget.o -lcapstone -o libcustomsignal.dylib
+hexdump.o : hexdump.c
+	gcc -g -c hexdump.c
 
-a.out: aes-ni.c
-	gcc -maes aes-ni.c
+libcustomsignal.dylib: signal.o gadget.o hexdump.o
+	gcc -dynamiclib signal.o gadget.o hexdump.o -lcapstone -lkeystone -g -o libcustomsignal.dylib
+
+aes-ni.o: aes-ni.c
+	gcc -maes -g -c aes-ni.c
+
+a.out: aes-ni.o
+	gcc -maes -g aes-ni.o

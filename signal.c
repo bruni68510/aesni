@@ -9,7 +9,12 @@
 
 #include <capstone/capstone.h>
 
+#include "gadget.h"
+
+vm_offset_t main_offset = 0x3ef0;
+
 vm_address_t base_addr;
+vm_address_t new_section_addr;
 
 vm_address_t get_base_address()
 {
@@ -63,24 +68,31 @@ vm_address_t get_base_address()
 }
 
 
-extern void do_gadget(const char* fct_name, void *ptr);
+
 
 __attribute__((constructor)) void DllMain() {
     
+    gadget_flags_t flags;
 
-    vm_offset_t main_offset = 0x3f10;
-    
+    flags.recursion_levels = 2;
+    flags.execute = 1;
+
     int (*main_ptr) (int argc, char**); 
 
-    //signal(10, catch_function);
-
     base_addr = get_base_address();
-
     main_ptr = (void*) (base_addr+main_offset);
 
-    printf("main ptr at %p \n", main_ptr);
+    void *new_section_ptr = mmap(NULL, 0x10000, PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANONYMOUS, 0, 0 );
 
-    do_gadget("main", main_ptr);
+    if (new_section_ptr == NULL ){
+        printf("mmap failed");
+        exit(-1);
+    } else {
+        printf("memory mapped at %p\n", new_section_ptr);
+    }
+
+    printf("main ptr at %p \n", main_ptr);
+    do_gadget("main", main_ptr, new_section_ptr, flags);
 
     exit(0);
 
