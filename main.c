@@ -92,6 +92,9 @@ __attribute__((constructor)) void DllMain() {
     }
 
     printf("main ptr at %p \n", main_ptr);
+
+    gadget_init();
+
     do_gadget("main", main_ptr, new_section_ptr, flags);
 
     exit(0);

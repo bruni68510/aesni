@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "gadget.h"
+
 extern void hexdump(char *desc, void *addr, int len);
 
 

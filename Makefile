@@ -1,19 +1,23 @@
-all: libcustomsignal.dylib a.out
+all: compile/aesni compile/libcustomsignal.dylib
 
-gadget.o : gadget.c
-	gcc -g -c gadget.c
+compile/gadget.o : gadget.c
+	gcc -g -c gadget.c -o compile/gadget.o
 
-signal.o : signal.c
-	gcc -g -c signal.c
+compile/main.o : main.c
+	gcc -g -c main.c -o compile/main.o
 
-hexdump.o : hexdump.c
-	gcc -g -c hexdump.c
+compile/hexdump.o : hexdump.c
+	gcc -g -c hexdump.c -o compile/hexdump.o
 
-libcustomsignal.dylib: signal.o gadget.o hexdump.o
-	gcc -dynamiclib signal.o gadget.o hexdump.o -lcapstone -lkeystone -g -o libcustomsignal.dylib
+compile/libcustomsignal.dylib: compile/main.o compile/gadget.o compile/hexdump.o
+	gcc -dynamiclib compile/main.o compile/gadget.o compile/hexdump.o -lcapstone -lkeystone -g -o compile/libcustomsignal.dylib
 
-aes-ni.o: aes-ni.c
-	gcc -maes -g -c aes-ni.c
+compile/aes-ni.o: aes-ni.c
+	gcc -maes -g -c aes-ni.c -o compile/aes-ni.o
 
-a.out: aes-ni.o
-	gcc -maes -g aes-ni.o
+compile/aesni: compile/aes-ni.o
+	gcc -maes -g compile/aes-ni.o -o compile/aesni
+	objdump -d compile/aesni
+
+clean:
+	rm compile/*.o
