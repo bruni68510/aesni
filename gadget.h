@@ -19,6 +19,8 @@ typedef struct gadget_flags_struct gadget_flags_t;
 struct mapped_function_struct {
     void *source_ptr;
     void *dest_ptr;
+    void *jmp_ptr;
+    void *gadget_ptr;
 };
 
 typedef struct mapped_function_struct mapped_function_t;
@@ -30,7 +32,9 @@ struct trampoline_jmp_struct {
 
 typedef struct trampoline_jmp_struct trampoline_jmp_t;
 
-void gadget_init(u_int64_t base_address);
-void* do_gadget(const char* fct_name, void *ptr, void *dest_addr, gadget_flags_t flags);
+void gadget_init(u_int64_t base_address, void* gadget_start_addr);
+void gadget_create_hook(void *start_address, int functionnr) ;
+void gadget_relocate_calls(const char* fct_name, void *ptr, void *fct_dest_addr, gadget_flags_t flags);
+void gadget_create_hooks();
 
 #endif

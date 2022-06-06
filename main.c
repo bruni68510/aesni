@@ -11,7 +11,7 @@
 
 #include "gadget.h"
 
-vm_offset_t main_offset = 0x3ef0;
+vm_offset_t main_offset = 0x3ed0;
 
 vm_address_t base_addr;
 vm_address_t new_section_addr;
@@ -68,10 +68,22 @@ vm_address_t get_base_address()
 }
 
 
+void* map_memory(const char* name, int size) {
+    void *map = mmap(NULL, 0x10000, PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANONYMOUS, 0, 0 );
+
+    if (map == NULL ){
+        printf("mmap failed");
+        exit(-1);
+    } else {
+        printf("memory mapped at %p\n", map);
+    }
+
+    return map;
+}
 
 
 __attribute__((constructor)) void DllMain() {
-    
+    /*
     gadget_flags_t flags;
 
     flags.recursion_levels = 2;
@@ -81,22 +93,25 @@ __attribute__((constructor)) void DllMain() {
 
     base_addr = get_base_address();
     main_ptr = (void*) (base_addr+main_offset);
-
-    void *new_section_ptr = mmap(NULL, 0x10000, PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANONYMOUS, 0, 0 );
-
-    if (new_section_ptr == NULL ){
-        printf("mmap failed");
-        exit(-1);
-    } else {
-        printf("memory mapped at %p\n", new_section_ptr);
-    }
-
     printf("main ptr at %p \n", main_ptr);
 
-    gadget_init(base_addr);
+    void *fct_section_ptr = map_memory("function memory", 0x10000);
+    void *gadget_section_ptr = map_memory("function memory", 0x10000);
 
-    do_gadget("main", main_ptr, new_section_ptr, flags);
+    memcpy(fct_section_ptr, (void*) base_addr, 0x9000);
+
+    gadget_init(base_addr, gadget_section_ptr);
+
+    gadget_relocate_calls("main", main_ptr, fct_section_ptr+main_offset, flags);
+
+    gadget_create_hooks();
+
+    main_ptr = fct_section_ptr+main_offset ;
+
+    //asm( "callq *%0" :: "r" (fct_section_ptr+main_offset));
+
+    main_ptr(0, NULL);
 
     exit(0);
-
+    */
 }
